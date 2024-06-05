@@ -13,6 +13,41 @@ namespace MyDIAPI
             SBO.Connection connection = new SBO.Connection();
             connection.Connect();
 
+
+            //CreateBusinessPartner(connection);
+
+            long returnCode;
+            string errMsg = string.Empty;
+
+            SAPbobsCOM.Items items = (SAPbobsCOM.Items)connection.company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oItems);
+
+            items.ItemCode = "Code1324";
+            items.ItemName = "My First Desc";
+            items.ItemType = SAPbobsCOM.ItemTypeEnum.itItems;
+            items.ItemsGroupCode = 100;
+            items.SalesItem = SAPbobsCOM.BoYesNoEnum.tYES;
+
+            returnCode = items.Add();
+
+            if (returnCode == 0)
+            {
+                connection.company.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_Commit);
+            }
+            else
+            {
+                if (connection.company.InTransaction)
+                {
+                    connection.company.EndTransaction(SAPbobsCOM.BoWfTransOpt.wf_RollBack);
+                }
+
+                errMsg = connection.company.GetLastErrorDescription();
+            }
+
+
+            Console.Read();
+        }
+
+        public static void CreateBusinessPartner(SBO.Connection connection) {
             long returnCode;
             string errMsg = string.Empty;
 
@@ -69,8 +104,6 @@ namespace MyDIAPI
 
                 Console.WriteLine(ex.Message);
             }
-
-            Console.Read();
         }
     }
 }
